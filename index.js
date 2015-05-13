@@ -11,11 +11,21 @@ app.get('/keypress.js', function(req, res){
 
 var robotSocket = null;
 io.on('connection', function(socket){
-  socket.on('keypress', function(keyPressed){
+  socket.on('keydown', function(keyPressed){
     console.log("keypressed - notifying robot of:" + keyPressed);
     if(robotSocket){
       console.log("robot ready");
-      robotSocket.emit('keypress', keyPressed);
+      robotSocket.emit('keydown', keyPressed);
+    }else{
+      console.log("no robot");
+      socket.emit('norobot');
+    }
+  });
+  socket.on('stop', function(){
+    console.log("stopping robot");
+    if(robotSocket){
+      console.log("robot ready");
+      robotSocket.emit('stop');
     }else{
       console.log("no robot");
       socket.emit('norobot');
