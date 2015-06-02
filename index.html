@@ -14,7 +14,7 @@
     </style>
   </head>
   <body>
-    <iframe src="" width="600" height="400"/>
+    <!-- <iframe src="" width="600" height="400"/> -->
     <ul id="messages"></ul>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
@@ -30,10 +30,10 @@
       var listener = new window.keypress.Listener();
       var my_scope = this;
       var my_combos = listener.register_many([
-          makeListener("w","up"),
-          makeListener("a","left"),
-          makeListener("s","down"),
-          makeListener("d","right"),
+          makeListener("w","f"),
+          makeListener("a","l"),
+          makeListener("s","b"),
+          makeListener("d","r"),
           makeListener("enter","shoot")
       ]);
       function makeListener(keys,command){
@@ -42,6 +42,7 @@
             "is_exclusive"  : true,
             "prevent_repeat": true,
             "on_keydown"    : function(e) {
+                console.log("keydown " + command);
                 socket.emit("keydown",command);
             },
             "on_keyup"      : function(e) {
