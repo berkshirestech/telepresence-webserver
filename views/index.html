@@ -52,5 +52,25 @@
         }
       }
     </script>
+
+    <div style='position: relative; left: 50%'>
+      <a href='{{hangout_url}}' target='_blank'>Click to open hangout</a>
+      <div><button data-action='f'>Forward</button></div>
+      <div>
+        <span><button data-action='l'>Left</button></span>
+        <span><button data-action-'r'>Right</button></span>
+      </div>
+      <div><button data-action='b'>Back</button></div>
+    </div>
+
+    <script>
+$('button').on('keydown', function(event) {
+  socket.emit('keydown', $(event.currentTarget).data('action'));
+});
+
+$('button').on('keydown', function(event) {
+  socket.emit("stop");
+});
+    </script>
   </body>
 </html>

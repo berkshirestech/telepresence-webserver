@@ -2,8 +2,13 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+app.set('view engine', 'html');
+app.enable('view cache');
+app.engine('html', require('hogan-express'));
+
 app.get('/', function(req, res){
-  res.sendfile('index.html');
+  res.render('index', { title: 'BCTG Telepresence Robot',
+                        hangout_url: process.env["HANGOUT_URL"]});
 });
 app.get('/keypress.js', function(req, res){
   res.sendfile('bower_components/Keypress/keypress.js');
