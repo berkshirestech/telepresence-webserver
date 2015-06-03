@@ -64,11 +64,11 @@
     </div>
 
     <script>
-$('button').on('keydown', function(event) {
+$('button').on('mousedown', function(event) {
   socket.emit('keydown', $(event.currentTarget).data('action'));
 });
 
-$('button').on('keydown', function(event) {
+$('button').on('mouseup', function(event) {
   socket.emit("stop");
 });
     </script>
