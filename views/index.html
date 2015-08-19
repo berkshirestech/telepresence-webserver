@@ -19,6 +19,7 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="/keypress.js"></script>
+    <script src="/gamecontroller.js"></script>
     <script>
       var socket = io();
       socket.on('chat message', function(msg){
@@ -55,7 +56,18 @@
             "this"          : my_scope
         }
       }
+      function dpadListener(command){
+        return {
+          touchStart:function(){
+            socket.emit("keydown",command);
+          },
+          touchEnd:function(){
+            socket.emit("stop")
+          }
+        }
+      }
     </script>
+
 
     <div style='position: relative; left: 50%'>
       <a href='{{hangout_url}}' target='_blank'>Click to open hangout</a>
@@ -68,13 +80,33 @@
     </div>
 
     <script>
-$('button').on('mousedown', function(event) {
-  socket.emit('keydown', $(event.currentTarget).data('action'));
-});
+      $(function(){
 
-$('button').on('mouseup', function(event) {
-  socket.emit("stop");
-});
+        GameController.init( {
+          left: {
+            dpad: {
+              up: dpadListener("f"),
+              left: dpadListener("l"),
+              right: dpadListener("r"),
+              down: dpadListener("b")
+            }
+          },
+          right: {
+            dpad:{
+              up: dpadListener("U"),
+              left: dpadListener("L"),
+              right: dpadListener("R"),
+              down: dpadListener("D")
+            }
+          }
+        });
+// $('button').on('mousedown', function(event) {
+//   socket.emit('keydown', $(event.currentTarget).data('action'));
+// });
+//
+// $('button').on('mouseup', function(event) {
+//   socket.emit("stop");
+// });
     </script>
   </body>
 </html>

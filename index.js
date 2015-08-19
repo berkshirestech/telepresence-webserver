@@ -13,6 +13,9 @@ app.get('/', function(req, res){
 app.get('/keypress.js', function(req, res){
   res.sendfile('bower_components/Keypress/keypress.js');
 });
+app.get('/gamecontroller.js', function(req, res){
+  res.sendfile('scripts/html5-virtual-game-controller-master/gamecontroller.js');
+});
 
 var robotSocket = null;
 io.on('connection', function(socket){
