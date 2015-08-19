@@ -3,14 +3,68 @@
   <head>
     <title>Socket.IO chat</title>
     <style>
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
+      html,body{
+        margin:0;
+        height:100%;
+        width:100%;
+      }
+      .controls{
+        width: 100%;
+        height:100%;
+      }
+      .dpad{
+        width:200px;
+        height:200px;
+      }
+      .dpad.left{
+        position:absolute;
+        bottom:10%;
+        left:10%;
+      }
+      .dpad div{
+        background-color: blue;
+      }
+      .dpad .press{
+        background-color: red;
+      }
+
+      .dpad.right{
+        position:absolute;
+        bottom:10%;
+        right:10%;
+      }
+      .dpad .up{
+        position: absolute;
+        width:50px;
+        margin-left:-25px;
+        height:80px;
+        top:0;
+        left:50%;
+      }
+      .dpad .left{
+        position: absolute;
+        width:80px;
+        margin-top:-25px;
+        height:50px;
+        top:50%;
+        left:0;
+      }
+      .dpad .right{
+        position: absolute;
+        width:80px;
+        margin-top:-25px;
+        height:50px;
+        top:50%;
+        right:0;
+      }
+      .dpad .down{
+        position: absolute;
+        width:50px;
+        margin-left:-25px;
+        height:80px;
+        bottom:0;
+        left:50%;
+      }
     </style>
   </head>
   <body>
@@ -19,8 +73,19 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="/keypress.js"></script>
-    <script src="/gamecontroller.js"></script>
     <script>
+      (function ($) {
+        $.fn.tdown = function (onclick) {
+            this.bind("touchstart", function (e) { onclick.call(this, e); e.stopPropagation(); e.preventDefault(); });
+            this.bind("mousedown", function (e) { onclick.call(this, e); });   //substitute mousedown event for exact same result as touchstart
+            return this;
+        };
+        $.fn.tup = function (onclick) {
+            this.bind("touchend", function (e) { onclick.call(this, e); e.stopPropagation(); e.preventDefault(); });
+            this.bind("mouseup", function (e) { onclick.call(this, e); });   //substitute mousedown event for exact same result as touchstart
+            return this;
+        };
+      })(jQuery);
       var socket = io();
       socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
@@ -56,57 +121,39 @@
             "this"          : my_scope
         }
       }
-      function dpadListener(command){
-        return {
-          touchStart:function(){
-            socket.emit("keydown",command);
-          },
-          touchEnd:function(){
-            socket.emit("stop")
-          }
-        }
-      }
     </script>
 
-
-    <div style='position: relative; left: 50%'>
-      <a href='{{hangout_url}}' target='_blank'>Click to open hangout</a>
-      <div><button data-action='f'>Forward</button></div>
-      <div>
-        <span><button data-action='l'>Left</button></span>
-        <span><button data-action='r'>Right</button></span>
+    <div class="controls">
+      <div class="dpad left">
+        <div class="up" data-action="f"></div>
+        <div class="down" data-action="b"></div>
+        <div class="left" data-action="l"></div>
+        <div class="right" data-action="r"></div>
       </div>
-      <div><button data-action='b'>Back</button></div>
+
+      <div class="dpad right">
+        <div class="up" data-action="U"></div>
+        <div class="down" data-action="D"></div>
+        <div class="left" data-action="L"></div>
+        <div class="right" data-action="R"></div>
+      </div>
     </div>
 
     <script>
-      $(function(){
-
-        GameController.init( {
-          left: {
-            dpad: {
-              up: dpadListener("f"),
-              left: dpadListener("l"),
-              right: dpadListener("r"),
-              down: dpadListener("b")
-            }
-          },
-          right: {
-            dpad:{
-              up: dpadListener("U"),
-              left: dpadListener("L"),
-              right: dpadListener("R"),
-              down: dpadListener("D")
-            }
+      $('.dpad')
+        .tdown(function(event){
+          var action = event.target.dataset.action;
+          console.log(action);
+          if(action){
+            console.log("send action!");
+            socket.emit("keydown",action);
           }
         });
-// $('button').on('mousedown', function(event) {
-//   socket.emit('keydown', $(event.currentTarget).data('action'));
-// });
-//
-// $('button').on('mouseup', function(event) {
-//   socket.emit("stop");
-// });
+      $('.controls')
+        .tup(function(){
+          console.log("stop");
+          socket.emit("stop")
+        });
     </script>
   </body>
 </html>
