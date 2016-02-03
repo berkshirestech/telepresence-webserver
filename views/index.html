@@ -73,6 +73,7 @@
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="/keypress.js"></script>
+    <script src="/webrtc.js"></script>
     <script>
       (function ($) {
         $.fn.tdown = function (onclick) {
@@ -154,6 +155,73 @@
           console.log("stop");
           socket.emit("stop")
         });
+    </script>
+
+    <script>
+      // Here's an example in javascript
+      myIceServers = {{{ ice_servers }}};
+      var configuration = { iceServers: myIceServers };
+      var pc = new RTCPeerConnection(configuration);
+
+      pc.onaddstream = function(obj) {
+        var vid = document.createElement("video");
+        document.getElementsByTagName('body')[0].appendChild(vid);
+        vid.srcObject = obj.stream;
+      }
+
+      // Helper functions
+      function endCall() {
+        var videos = document.getElementsByTagName("video");
+        for (var i = 0; i < videos.length; i++) {
+          videos[i].pause();
+        }
+
+        pc.close();
+      }
+
+      function error(err) {
+        endCall();
+      }
+
+      {{#host}}
+        navigator.getUserMedia({video: true}, function(stream) {
+          // Adding a local stream won't trigger the onaddstream callback,
+          // so call it manually.
+          pc.onaddstream({stream: stream});
+          pc.addStream(stream);
+
+          pc.createOffer(function(offer) {
+            pc.setLocalDescription(new RTCSessionDescription(offer), function() {
+              socket.emit('offer-created', offer)
+            }, error);
+          }, error);
+        }, error);
+
+        socket.on('offer-accepted', function(answer) {
+          console.log('accepted!');
+          pc.setRemoteDescription(
+              new RTCSessionDescription(answer),
+              function() { },
+              error);
+        });
+      {{/host}}
+
+      {{^host}}
+        var offer = {{{ offer }}};
+        navigator.getUserMedia({video: true}, function(stream) {
+          pc.onaddstream({stream: stream});
+          pc.addStream(stream);
+
+          pc.setRemoteDescription(new RTCSessionDescription(offer), function() {
+            pc.createAnswer(function(answer) {
+              pc.setLocalDescription(new RTCSessionDescription(answer), function() {
+                socket.emit('accept-offer', answer)
+              }, error);
+            }, error);
+          }, error);
+        }, error);
+      {{/host}}
+
     </script>
   </body>
 </html>
