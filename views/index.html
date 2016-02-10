@@ -125,7 +125,7 @@
       }
     </script>
 
-    {{#host}}
+    {{^host}}
       <div class="controls">
         <div class="dpad left">
           <div class="up" data-action="f"></div>
@@ -145,7 +145,7 @@
       </div>
     {{/host}}
 
-    {{^host}}
+    {{#host}}
       <video style='left: 250px;' width="300" id="remoteVideos"></video>
     {{/host}}
 
