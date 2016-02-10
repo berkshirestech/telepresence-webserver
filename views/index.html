@@ -173,6 +173,10 @@
         autoRequestMedia: true
       });
 
+      webrtc.on('readyToCall', function () {
+        // you can name it anything
+        webrtc.joinRoom('teleconference robot');
+      });
     </script>
   </body>
 </html>
