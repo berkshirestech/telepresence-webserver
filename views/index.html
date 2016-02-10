@@ -184,6 +184,7 @@
       }
 
       {{#host}}
+        socket.emit('iamahost');
         navigator.getUserMedia({video: true}, function(stream) {
           // Adding a local stream won't trigger the onaddstream callback,
           // so call it manually.
@@ -207,6 +208,7 @@
       {{/host}}
 
       {{^host}}
+        socket.emit('iamaclient');
         var offer = {{{ offer }}};
         navigator.getUserMedia({video: true}, function(stream) {
           pc.onaddstream({stream: stream});

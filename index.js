@@ -48,6 +48,8 @@ app.get('/gamecontroller.js', function(req, res){
 });
 
 var robotSocket = null;
+var hostSocket = null;
+var clientSocket = null;
 io.on('connection', function(socket){
   socket.on('keydown', function(keyPressed){
     console.log("keypressed - notifying robot of:" + keyPressed);
@@ -69,18 +71,29 @@ io.on('connection', function(socket){
       socket.emit('norobot');
     }
   });
+
   socket.on('imarobot', function(){
     robotSocket = socket;
     robotSocket.on('disconnect', function(){
       robotSocket = null;
     });
   });
+
+  socket.on('iamahost', function() {
+    hostSocket = socket;
+  });
+
+  socket.on('iamaclient', function() {
+    clientSocket = socket;
+  });
+
   socket.on('offer-created', function(data){
     sessionData = data;
   });
+
   socket.on('accept-offer', function(data){
     console.log('accept-offer!');
-    socket.emit('offer-accepted', data)
+    hostSocket.emit('offer-accepted', data)
   });
 });
 
