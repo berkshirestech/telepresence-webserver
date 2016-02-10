@@ -66,6 +66,7 @@
         left:50%;
       }
     </style>
+    <script src="https://simplewebrtc.com/latest-v2.js"></script>
   </head>
   <body>
     <!-- <iframe src="" width="600" height="400"/> -->
@@ -140,6 +141,9 @@
       </div>
     </div>
 
+    <video height="300" id="localVideo"></video>
+    <div id="remotesVideos"></div>
+
     <script>
       $('.dpad')
         .tdown(function(event){
@@ -158,71 +162,16 @@
     </script>
 
     <script>
-      // Here's an example in javascript
       myIceServers = {{{ ice_servers }}};
-      var configuration = { iceServers: myIceServers };
-      var pc = new RTCPeerConnection(configuration);
 
-      pc.onaddstream = function(obj) {
-        var vid = document.createElement("video");
-        document.getElementsByTagName('body')[0].appendChild(vid);
-        vid.srcObject = obj.stream;
-      }
-
-      // Helper functions
-      function endCall() {
-        var videos = document.getElementsByTagName("video");
-        for (var i = 0; i < videos.length; i++) {
-          videos[i].pause();
-        }
-
-        pc.close();
-      }
-
-      function error(err) {
-        endCall();
-      }
-
-      {{#host}}
-        socket.emit('iamahost');
-        navigator.getUserMedia({video: true}, function(stream) {
-          // Adding a local stream won't trigger the onaddstream callback,
-          // so call it manually.
-          pc.onaddstream({stream: stream});
-          pc.addStream(stream);
-
-          pc.createOffer(function(offer) {
-            pc.setLocalDescription(new RTCSessionDescription(offer), function() {
-              socket.emit('offer-created', offer)
-            }, error);
-          }, error);
-        }, error);
-
-        socket.on('offer-accepted', function(answer) {
-          console.log('accepted!');
-          pc.setRemoteDescription(
-              new RTCSessionDescription(answer),
-              function() { },
-              error);
-        });
-      {{/host}}
-
-      {{^host}}
-        socket.emit('iamaclient');
-        var offer = {{{ offer }}};
-        navigator.getUserMedia({video: true}, function(stream) {
-          pc.onaddstream({stream: stream});
-          pc.addStream(stream);
-
-          pc.setRemoteDescription(new RTCSessionDescription(offer), function() {
-            pc.createAnswer(function(answer) {
-              pc.setLocalDescription(new RTCSessionDescription(answer), function() {
-                socket.emit('accept-offer', answer)
-              }, error);
-            }, error);
-          }, error);
-        }, error);
-      {{/host}}
+      var webrtc = new SimpleWebRTC({
+        // the id/element dom element that will hold "our" video
+        localVideoEl: 'localVideo',
+        // the id/element dom element that will hold remote videos
+        remoteVideosEl: 'remotesVideos',
+        // immediately ask for camera access
+        autoRequestMedia: true
+      });
 
     </script>
   </body>
