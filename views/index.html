@@ -141,7 +141,7 @@
 
     $(document).on('ready', function() {
       $('.js-script-submit').on('click', function() {
-        socket.emit('script', $('.js-script').value());
+        socket.emit('script', $('.js-script').val());
       });
     });
 
@@ -166,8 +166,8 @@
 
       <div class='remotes-box' id="remotesVideos"></div>
 
-      <h3>Script</h3>
-      <div>
+      <div style='float: center'>
+        <h3>Script</h3>
         <textarea class='js-script btn'>
         </textarea>
         <button class='js-script-submit'>Submit</button>
