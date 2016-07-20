@@ -50,6 +50,7 @@ app.get('/gamecontroller.js', function(req, res){
 var robotSocket = null;
 var hostSocket = null;
 var clientSocket = null;
+
 io.on('connection', function(socket){
   socket.on('keydown', function(keyPressed){
     console.log("keypressed - notifying robot of:" + keyPressed);
@@ -95,5 +96,14 @@ io.on('connection', function(socket){
     console.log('accept-offer!');
     hostSocket.emit('offer-accepted', data)
   });
+
+  socket.on('script', function(data){
+    if(robotSocket) {
+      robotSocket.emit('script', data);
+    } else {
+      console.log('no robot');
+    }
+  });
+
 });
 

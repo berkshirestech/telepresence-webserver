@@ -138,6 +138,13 @@
             "this"          : my_scope
         }
       }
+
+    $(document).on('ready', function() {
+      $('.js-script-submit').on('click', function() {
+        socket.emit('script', $('.js-script').value());
+      });
+    });
+
     </script>
 
     {{^host}}
@@ -158,6 +165,13 @@
       </div>
 
       <div class='remotes-box' id="remotesVideos"></div>
+
+      <h3>Script</h3>
+      <div>
+        <textarea class='js-script'>
+        </textarea>
+        <button class='js-script-submit'></button>
+      </div>
     {{/host}}
 
     {{#host}}
